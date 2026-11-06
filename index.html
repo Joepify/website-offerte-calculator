@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Website offerte calculator (indicatie)</title>
+<style>
+  :root{--bg:#fff;--fg:#14171a;--mut:#5b6670;--line:#d9dee3;--acc:#0b5fff;--card:#f5f7fa}
+  @media (prefers-color-scheme:dark){:root{--bg:#101316;--fg:#eef1f4;--mut:#9aa6b2;--line:#2b3238;--acc:#6ea0ff;--card:#181d22}}
+  *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,Arial,sans-serif}
+  main{max-width:720px;margin:0 auto;padding:24px 16px 48px}
+  h1{font-size:1.5rem;margin:0 0 4px}fieldset{border:1px solid var(--line);border-radius:10px;margin:16px 0;padding:12px 16px}
+  legend{font-weight:600;padding:0 6px}label{display:block;padding:4px 0}
+  .result{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-top:16px}
+  .big{font-size:1.6rem;font-weight:700}.note{color:var(--mut);font-size:.9rem}
+  .warn{border-left:4px solid var(--acc);padding:8px 12px;background:var(--card);margin:12px 0}
+  a{color:var(--acc)}
+</style>
+</head>
+<body>
+<main>
+<h1>Wat kost een website? Een indicatie</h1>
+<p class="note">Gebaseerd op de publieke prijzen van <a href="https://www.joepify.nl">Joepify</a>, exclusief btw. <strong>Indicatie, geen offerte.</strong></p>
+
+<form id="f">
+<fieldset><legend>Wat wil je laten maken?</legend>
+<label><input type="radio" name="type" value="website" checked> Website (WordPress)</label>
+<label><input type="radio" name="type" value="shopify"> Webshop in Shopify</label>
+<label><input type="radio" name="type" value="woocommerce"> Webshop in WooCommerce</label>
+<label><input type="radio" name="type" value="software"> Maatwerksoftware</label>
+</fieldset>
+
+<fieldset id="s-website"><legend>Hoeveel pagina's?</legend>
+<label><input type="radio" name="paginas" value="1"> Eén pagina (onepager)</label>
+<label><input type="radio" name="paginas" value="2-5" checked> 2 tot 5 pagina's</label>
+<label><input type="radio" name="paginas" value="6-15"> 6 tot 15 pagina's</label>
+<label><input type="radio" name="paginas" value="15+"> Meer dan 15 pagina's</label>
+</fieldset>
+
+<fieldset id="s-shop" hidden><legend>Hoe groot is het assortiment?</legend>
+<label><input type="radio" name="assortiment" value="klein" checked> Klein (tot ongeveer 50 producten)</label>
+<label><input type="radio" name="assortiment" value="vast"> Vast assortiment met varianten</label>
+<label><input type="radio" name="assortiment" value="groot"> Groot assortiment, filters of B2B</label>
+</fieldset>
+
+<fieldset id="s-software" hidden><legend>Wat voor software?</legend>
+<label><input type="radio" name="software" value="app" checked> Web app of klantportaal</label>
+<label><input type="radio" name="software" value="systeem"> Bedrijfssysteem</label>
+<label><input type="radio" name="software" value="saas"> SaaS-platform of enterprise</label>
+</fieldset>
+
+<fieldset><legend>Extra's</legend>
+<label><input type="checkbox" name="extras" value="uitgebreide-seo"> Uitgebreide SEO</label>
+<label><input type="checkbox" name="extras" value="meertalig"> Meertalig</label>
+<label><input type="checkbox" name="extras" value="boekhouding"> Koppeling boekhouding of ERP</label>
+<label><input type="checkbox" name="extras" value="afspraken"> Online afspraken</label>
+<label><input type="checkbox" name="extras" value="blog"> Blog of nieuws</label>
+<label><input type="checkbox" name="extras" value="teksten-laten-maken"> Teksten en foto's laten maken</label>
+<label><input type="checkbox" name="extras" value="overstap"> Overstap van een andere webshop</label>
+</fieldset>
+
+<fieldset><legend>Hosting en onderhoud</legend>
+<label><input type="radio" name="onderhoud" value="geen" checked> Regel ik zelf</label>
+<label><input type="radio" name="onderhoud" value="hosting"> Hosting en e-mail</label>
+<label><input type="radio" name="onderhoud" value="wp-basis"> Hosting en WordPress onderhoud</label>
+<label><input type="radio" name="onderhoud" value="shopify-beheer"> Shopify beheer</label>
+</fieldset>
+</form>
+
+<div class="result" aria-live="polite">
+  <div class="note">Indicatie bouwprijs, exclusief btw</div>
+  <div class="big" id="prijs"></div>
+  <p id="eerstejaar"></p>
+  <p id="zzp"></p>
+  <div id="offerte"></div>
+  <div class="warn">Dit is een indicatie, geen offerte. Een vaste prijs krijg je na een kort gesprek. De actuele prijzen staan op <a href="https://www.joepify.nl/website-laten-maken-kosten">wat een website laten maken kost</a>.</div>
+</div>
+
+<p class="note">Open source (MIT). Prijzen gecontroleerd op 4 november 2026; ze kunnen sinds die datum zijn gewijzigd. Geen cookies, geen tracking, alles draait in je browser.</p>
+</main>
+<script src="calculator.js"></script>
+<script>
+(function(){
+  var f=document.getElementById("f");
+  function val(n){var e=f.querySelector('input[name="'+n+'"]:checked');return e?e.value:null}
+  function render(){
+    var type=val("type");
+    document.getElementById("s-website").hidden=type!=="website";
+    document.getElementById("s-shop").hidden=!(type==="shopify"||type==="woocommerce");
+    document.getElementById("s-software").hidden=type!=="software";
+    var extras=[].map.call(f.querySelectorAll('input[name="extras"]:checked'),function(e){return e.value});
+    var r=Calculator.bouw({type:type,paginas:val("paginas"),assortiment:val("assortiment"),software:val("software"),extras:extras,onderhoud:val("onderhoud")});
+    var e=Calculator.euro, p=document.getElementById("prijs");
+    if(r.min===null){p.textContent="Op offerte"}
+    else if(r.max===null){p.textContent="Vanaf "+e(r.min)}
+    else if(r.min===r.max){p.textContent=e(r.min)}
+    else{p.textContent=e(r.min)+" tot "+e(r.max)}
+    var jaar=document.getElementById("eerstejaar");
+    jaar.textContent=r.min===null?"":(r.maandPerMaand
+      ? "Eerste jaar met "+r.maandTekst.toLowerCase()+": "+(r.max===null?"vanaf "+e(r.eersteJaarMin):(r.eersteJaarMin===r.eersteJaarMax?e(r.eersteJaarMin):e(r.eersteJaarMin)+" tot "+e(r.eersteJaarMax)))+"."
+      : "Pakket: "+r.pakket+". "+r.maandTekst+".");
+    document.getElementById("zzp").textContent=r.zzp?"Voor een eenpagina-site is er ook ZZP Starter: "+e(r.zzp.per24)+" per maand over 24 maanden (of "+e(r.zzp.per12)+" per maand over 12 maanden), zonder opstartkosten.":"";
+    var o=document.getElementById("offerte");
+    var tekst=r.notities.slice();
+    if(r.opOfferte.length){tekst.push("Gekozen extra's zonder vast bedrag, dus op offerte: "+r.opOfferte.join(", ")+".")}
+    o.innerHTML="";tekst.forEach(function(t){var d=document.createElement("p");d.className="note";d.textContent=t;o.appendChild(d)});
+  }
+  f.addEventListener("change",render);render();
+})();
+</script>
+</body>
+</html>
